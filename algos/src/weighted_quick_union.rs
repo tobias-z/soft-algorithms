@@ -1,14 +1,19 @@
 struct UF {
     ids: Vec<usize>,
+    id_sizes: Vec<usize>,
 }
 
+// can be used for things like perculation
 impl UF {
     fn new(n: usize) -> Self {
         let mut ids: Vec<usize> = vec![];
         for i in 0..n {
             ids.push(i);
         }
-        Self { ids }
+        Self {
+            ids,
+            id_sizes: vec![1; n],
+        }
     }
 
     fn connected(self: &Self, p: usize, q: usize) -> bool {
@@ -20,13 +25,26 @@ impl UF {
         if val == n {
             return val;
         }
-        self.find_root(val)
+        // flatten the tree so that the path becomes even smaller
+        // you could also do a complete flattening of the tree
+        self.ids[n] = self.ids[self.ids[n]];
+        self.find_root(slef.ids[n])
     }
 
-    fn union(mut self: Self, p: usize, q: usize) -> UF {
+    // Ensure that we have smaller trees by always linking the smaller tree to the bigger one
+    fn union(mut self: Self, p: usize, q: usize) -> Self {
         let p_root = self.find_root(p);
         let q_root = self.find_root(q);
-        self.ids[p_root] = q_root;
+        if p_root == q_root {
+            return; // they are already linked
+        }
+        if self.id_sizes[p] >= self.id_sizes[q] {
+            self.ids[q_root] = p_root;
+            self.id_sizes[p_root] += self.id_sizes[q_root];
+        } else {
+            self.ids[q_root] = p_root;
+            self.id_sizes[q_root] += self.id_sizes[p_root];
+        }
         self
     }
 }

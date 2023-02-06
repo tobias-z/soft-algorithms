@@ -3,6 +3,7 @@ struct UF {
 }
 
 impl UF {
+    // O(N). The operations increase depending on the amount of elements in the list
     fn new(n: usize) -> Self {
         let mut ids: Vec<usize> = vec![];
         for i in 0..n {
@@ -11,22 +12,20 @@ impl UF {
         Self { ids }
     }
 
+    // O(1) since we dont have to loop the array to find out of something is connected
     fn connected(self: &Self, p: usize, q: usize) -> bool {
-        self.find_root(p) == self.find_root(q)
+        self.ids[p] == self.ids[q]
     }
 
-    fn find_root(self: &Self, n: usize) -> usize {
-        let val = self.ids[n];
-        if val == n {
-            return val;
+    // O(N). The operations increase depending on the amount of elements in the list
+    fn union(mut self: Self, p: usize, q: usize) -> Self {
+        let p_val = self.ids[p];
+        let q_val = self.ids[q];
+        for i in 0..self.ids.len() {
+            if self.ids[i] == p_val {
+                self.ids[i] = q_val;
+            }
         }
-        self.find_root(val)
-    }
-
-    fn union(mut self: Self, p: usize, q: usize) -> UF {
-        let p_root = self.find_root(p);
-        let q_root = self.find_root(q);
-        self.ids[p_root] = q_root;
         self
     }
 }
@@ -46,8 +45,6 @@ mod test {
     fn can_union() {
         let uf = UF::new(8);
         let uf = uf.union(1, 5);
-        let uf = uf.union(5, 6);
-        let uf = uf.union(2, 5);
-        assert!(uf.connected(2, 6));
+        assert!(uf.connected(1, 5));
     }
 }

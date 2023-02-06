@@ -23,7 +23,7 @@ impl UF {
         self.find_root(val)
     }
 
-    fn union(mut self: Self, p: usize, q: usize) -> UF {
+    fn union(mut self: Self, p: usize, q: usize) -> Self {
         let p_root = self.find_root(p);
         let q_root = self.find_root(q);
         self.ids[p_root] = q_root;

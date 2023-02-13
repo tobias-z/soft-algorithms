@@ -32,11 +32,11 @@ impl UF {
     }
 
     // Ensure that we have smaller trees by always linking the smaller tree to the bigger one
-    fn union(mut self: Self, p: usize, q: usize) -> Self {
+    fn union(self: &mut Self, p: usize, q: usize) -> () {
         let p_root = self.find_root(p);
         let q_root = self.find_root(q);
         if p_root == q_root {
-            return self; // they are already linked
+            return; // they are already linked
         }
         if self.id_sizes[p] >= self.id_sizes[q] {
             self.ids[q_root] = p_root;
@@ -45,7 +45,6 @@ impl UF {
             self.ids[q_root] = p_root;
             self.id_sizes[q_root] += self.id_sizes[p_root];
         }
-        self
     }
 }
 
@@ -62,10 +61,10 @@ mod test {
 
     #[test]
     fn can_union() {
-        let uf = UF::new(8);
-        let uf = uf.union(1, 5);
-        let uf = uf.union(5, 6);
-        let mut uf = uf.union(2, 5);
+        let mut uf = UF::new(8);
+        uf.union(1, 5);
+        uf.union(5, 6);
+        uf.union(2, 5);
         assert!(uf.connected(2, 6));
     }
 }

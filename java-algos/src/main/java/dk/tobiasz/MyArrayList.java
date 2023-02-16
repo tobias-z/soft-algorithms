@@ -1,10 +1,8 @@
 package dk.tobiasz;
 
-import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.List;
 import java.util.Random;
-import java.util.stream.Collectors;
+import java.util.function.Predicate;
 
 public class MyArrayList<T> {
     private T[] data;
@@ -169,4 +167,55 @@ public class MyArrayList<T> {
         }
     }
 
+    // Upper O(n log(n))
+    // Lower O(n) ?? Because we may find the element as the root node
+    public T binarySearch(Predicate<T> predicate, Comparator<T> comparator) {
+        Node root = this.createBinaryTree(this.data, 0, this.size - 1);
+        if (root == null) {
+            return null;
+        }
+        return searchTree(root, predicate, comparator);
+    }
+
+    private Node createBinaryTree(T[] arr, int left, int right) {
+        if (left > right) {
+            return null;
+        }
+        int middle = left + (right - left) / 2;
+        Node node = new Node(arr[middle]);
+        node.left = createBinaryTree(arr, left, middle - 1);
+        node.right = createBinaryTree(arr, middle + 1, right);
+        return node;
+    }
+
+    private T searchTree(Node node, Predicate<T> predicate, Comparator<T> comparator) {
+        if (predicate.test(node.val)) {
+            return node.val;
+        }
+        if (node.left == null && node.right == null) {
+            return null;
+        }
+        if (node.left == null) {
+            return searchTree(node.right, predicate, comparator);
+        }
+        if (node.right == null) {
+            return searchTree(node.left, predicate, comparator);
+        }
+
+        int compare = comparator.compare(node.left.val, node.right.val);
+        if (compare > 0) {
+            return searchTree(node.left, predicate, comparator);
+        }
+        return searchTree(node.right, predicate, comparator);
+    }
+
+    class Node {
+        private final T val;
+        private Node left;
+        private Node right;
+
+        Node(T val) {
+            this.val = val;
+        }
+    }
 }

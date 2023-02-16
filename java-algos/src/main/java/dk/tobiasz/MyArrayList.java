@@ -157,6 +157,8 @@ public class MyArrayList<T> {
         return n % 2 != 0;
     }
 
+    // Upper O(n)
+    // Lower O(n)
     public void shuffle() {
         Random random = new Random();
         for (int i = 0; i < this.size; i++) {

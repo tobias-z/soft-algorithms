@@ -27,8 +27,8 @@ impl UF {
         }
         // flatten the tree so that the path becomes even smaller
         // you could also do a complete flattening of the tree
-        self.ids[n] = self.ids[self.ids[n]];
-        self.find_root(slef.ids[n])
+        // self.ids[n] = self.ids[self.ids[n]];
+        self.find_root(self.ids[n])
     }
 
     // Ensure that we have smaller trees by always linking the smaller tree to the bigger one
@@ -36,7 +36,7 @@ impl UF {
         let p_root = self.find_root(p);
         let q_root = self.find_root(q);
         if p_root == q_root {
-            return; // they are already linked
+            return self; // they are already linked
         }
         if self.id_sizes[p] >= self.id_sizes[q] {
             self.ids[q_root] = p_root;

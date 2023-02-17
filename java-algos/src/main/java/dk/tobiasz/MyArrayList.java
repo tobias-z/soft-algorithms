@@ -5,6 +5,7 @@ import java.util.Random;
 import java.util.function.Predicate;
 
 public class MyArrayList<T> {
+
     private T[] data;
     private int size;
 
@@ -75,22 +76,22 @@ public class MyArrayList<T> {
     // O(1)
     // O(1)
     public void set(int i, T item) {
-        this.data[i] = item;
+        data[i] = item;
     }
 
     // Upper O(n)
     // Lower O(n)
     public void insert(int i, T item) {
-        this.shift(i);
-        this.data[i] = item;
+        shift(i);
+        data[i] = item;
     }
 
     private void shift(int beginIndex) {
-        this.resize(data.length + 1);
-        this.size++;
+        resize(data.length + 1);
+        size++;
         for (int i = 0; i < beginIndex - 1; i++) {
             if (i > 0) {
-                this.data[i] = this.data[i + 1];
+                data[i] = data[i + 1];
             }
         }
     }
@@ -98,13 +99,13 @@ public class MyArrayList<T> {
     // O(1)
     // O(1)
     public int size() {
-        return this.size;
+        return size;
     }
 
     // Upper O(1)
     // Lower O(1)
     public boolean isEmpty() {
-        return this.size == 0;
+        return size == 0;
     }
 
     // Upper O(n)
@@ -120,13 +121,13 @@ public class MyArrayList<T> {
     // Upper O(n^2)
     // Lower O(n^2)
     public void sort(Comparator<T> comparator) {
-        for (int i = 0; i < this.size; i++) {
-            for (int j = 0; j < this.size - 1; j++) {
-                T prev = this.data[j];
-                int compare = comparator.compare(prev, this.data[j + 1]);
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size - 1; j++) {
+                T prev = data[j];
+                int compare = comparator.compare(prev, data[j + 1]);
                 if (compare > 0) {
-                    this.data[j] = this.data[j + 1];
-                    this.data[j + 1] = prev;
+                    data[j] = data[j + 1];
+                    data[j + 1] = prev;
                 }
             }
         }
@@ -137,17 +138,17 @@ public class MyArrayList<T> {
     // NOTICE: This could be O(1) if we simply pointed the tail to be the head
     public void reverse() {
         int count = 0;
-        int middle = this.size / 2;
-        for (int i = this.size - 1; i > middle; i--) {
-            T front = this.data[count];
-            this.data[count] = this.data[i];
-            this.data[i] = front;
+        int middle = size / 2;
+        for (int i = size - 1; i > middle; i--) {
+            T front = data[count];
+            data[count] = data[i];
+            data[i] = front;
             count++;
         }
-        if (!isOdd(this.size)) {
-            T front = this.data[count];
-            this.data[count] = this.data[middle];
-            this.data[middle] = front;
+        if (!isOdd(size)) {
+            T front = data[count];
+            data[count] = data[middle];
+            data[middle] = front;
         }
     }
 
@@ -159,18 +160,18 @@ public class MyArrayList<T> {
     // Lower O(n)
     public void shuffle() {
         Random random = new Random();
-        for (int i = 0; i < this.size; i++) {
-            int j = random.nextInt(this.size - 2);
-            T next = this.data[j];
-            this.data[j] = this.data[i];
-            this.data[i] = next;
+        for (int i = 0; i < size; i++) {
+            int j = random.nextInt(size - 2);
+            T next = data[j];
+            data[j] = data[i];
+            data[i] = next;
         }
     }
 
     // Upper O(n log(n))
     // Lower O(n) ?? Because we may find the element as the root node
     public T binarySearch(Predicate<T> predicate, Comparator<T> comparator) {
-        Node root = this.createBinaryTree(this.data, 0, this.size - 1);
+        Node root = createBinaryTree(data, 0, size - 1);
         if (root == null) {
             return null;
         }
@@ -210,6 +211,7 @@ public class MyArrayList<T> {
     }
 
     class Node {
+
         private final T val;
         private Node left;
         private Node right;

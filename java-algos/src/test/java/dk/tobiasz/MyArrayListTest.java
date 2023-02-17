@@ -1,9 +1,7 @@
 package dk.tobiasz;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import org.junit.jupiter.api.DisplayName;
@@ -103,14 +101,16 @@ class MyArrayListTest {
         list.add(-15);
         list.add(25);
         list.sort(Comparator.comparingInt(o -> o));
-        Integer found = list.binarySearch(i -> i == 25, (o1, o2) -> {
-            if (o1 > o2) {
-                return 1;
-            } else if (o1.equals(o2)) {
-                return 0;
-            }
-            return -1;
-        });
+        Integer found = list.binarySearch(
+            i -> i.equals(25),
+            (o1, o2) -> {
+                if (o1 > o2) {
+                    return 1;
+                } else if (o1.equals(o2)) {
+                    return 0;
+                }
+                return -1;
+            });
 
         System.out.println(found);
     }

@@ -1,5 +1,7 @@
 package dk.tobiasz;
 
+import java.util.Comparator;
+
 public class MyLinkedList<T> {
 
     Node tail;
@@ -173,6 +175,14 @@ public class MyLinkedList<T> {
         Node newTail = head;
         head = last;
         tail = newTail;
+    }
+
+    /**
+     * @param list1 sorted list
+     * @param list2 sorted list
+     */
+    public static <T> void merge(MyLinkedList<T> list1, MyLinkedList<T> list2) {
+
     }
 
     class Node {

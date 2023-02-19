@@ -139,8 +139,8 @@ class MyLinkedListTest {
         list1.addLast(1);
         list1.addLast(2);
         list1.addLast(3);
-        list1.addLast(4);
-        list1.addLast(7);
+        list1.addLast(9);
+        list1.addLast(-1);
 
         MyLinkedList<Integer> list2 = new MyLinkedList<>();
         list2.addLast(-5);
@@ -149,10 +149,9 @@ class MyLinkedListTest {
         list2.addLast(10);
         list2.addLast(17);
 
-        MyLinkedList<Integer> mergedList = MyLinkedList.mergeSortedLinkedList(list1, list2,
-            Comparator.comparingInt(o -> o));
+        list1.sort(Comparator.comparingInt(o -> o));
 
-        mergedList.printList();
+        list1.printList();
     }
 
 }

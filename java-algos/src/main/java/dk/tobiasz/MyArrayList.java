@@ -170,10 +170,10 @@ public class MyArrayList<T> {
 
     // Upper O(n log(n))
     // Lower O(n) ?? Because we may find the element as the root node
-    public T binarySearch(Predicate<T> predicate, Comparator<T> comparator) {
+    public int binarySearch(Predicate<T> predicate, Comparator<T> comparator) {
         Node root = createBinaryTree(data, 0, size - 1);
         if (root == null) {
-            return null;
+            return -1;
         }
         return searchTree(root, predicate, comparator);
     }
@@ -183,18 +183,18 @@ public class MyArrayList<T> {
             return null;
         }
         int middle = left + (right - left) / 2;
-        Node node = new Node(arr[middle]);
+        Node node = new Node(arr[middle], middle);
         node.left = createBinaryTree(arr, left, middle - 1);
         node.right = createBinaryTree(arr, middle + 1, right);
         return node;
     }
 
-    private T searchTree(Node node, Predicate<T> predicate, Comparator<T> comparator) {
+    private int searchTree(Node node, Predicate<T> predicate, Comparator<T> comparator) {
         if (predicate.test(node.val)) {
-            return node.val;
+            return node.index;
         }
         if (node.left == null && node.right == null) {
-            return null;
+            return -1;
         }
         if (node.left == null) {
             return searchTree(node.right, predicate, comparator);
@@ -213,11 +213,13 @@ public class MyArrayList<T> {
     class Node {
 
         private final T val;
+        private final int index;
         private Node left;
         private Node right;
 
-        Node(T val) {
+        Node(T val, int i) {
             this.val = val;
+            this.index = i;
         }
     }
 }

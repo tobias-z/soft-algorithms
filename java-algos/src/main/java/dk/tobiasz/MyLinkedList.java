@@ -178,49 +178,73 @@ public class MyLinkedList<T> {
         tail = newTail;
     }
 
-    /**
-     * Upper O(n)
-     * Lower O(1)
-     *
-     * @param list1 sorted list
-     * @param list2 sorted list
-     * @return merged list
-     */
-    public static <T> MyLinkedList<T> mergeSortedLinkedList(
-        MyLinkedList<T> list1,
-        MyLinkedList<T> list2,
-        Comparator<T> comparator
-    ) {
-        MyLinkedList<T> result = new MyLinkedList<>();
-        boolean hasNext = true;
-        Node<T> next1 = list1.head;
-        Node<T> next2 = list2.head;
-        while (hasNext) {
-            if (next1 == null && next2 == null) {
-                hasNext = false;
-                continue;
-            }
-            if (next1 == null) {
-                result.addLast(next2.val);
-                next2 = next2.next;
-                continue;
-            }
-            if (next2 == null) {
-                result.addLast(next1.val);
-                next1 = next1.next;
-                continue;
-            }
-            int compare = comparator.compare(next1.val, next2.val);
-            if (compare >= 0) {
-                result.addLast(next2.val);
-                next2 = next2.next;
-            } else {
-                result.addLast(next1.val);
-                next1 = next1.next;
-            }
-        }
-        return result;
+    public void sort(Comparator<T> comparator) {
+        NodeContainer<T> nodeContainer = sorted(new NodeContainer<>(head, tail), comparator);
+        head = nodeContainer.head();
+        tail = nodeContainer.tail();
     }
+
+    private NodeContainer<T> mergeNodes(Node<T> node1, Node<T> node2, Comparator<T> comparator) {
+        Node<T> sorted = new Node<>(null);
+        Node<T> currentNode = sorted;
+
+        while (node1 != null || node2 != null) {
+            if (node1 == null) {
+                currentNode.next = node2;
+                currentNode.next.prev = currentNode;
+                node2 = node2.next;
+                currentNode = currentNode.next;
+                continue;
+            }
+            if (node2 == null) {
+                currentNode.next = node1;
+                currentNode.next.prev = currentNode;
+                node1 = node1.next;
+                currentNode = currentNode.next;
+                continue;
+            }
+            int compare = comparator.compare(node1.val, node2.val);
+            if (compare >= 0) {
+                currentNode.next = node2;
+                currentNode.next.prev = currentNode;
+                node2 = node2.next;
+            } else {
+                currentNode.next = node1;
+                currentNode.next.prev = currentNode;
+                node1 = node1.next;
+            }
+            currentNode = currentNode.next;
+        }
+        return new NodeContainer<>(sorted.next, currentNode);
+    }
+
+    private NodeContainer<T> sorted(NodeContainer<T> nodeContainer, Comparator<T> comparator) {
+        Node<T> node = nodeContainer.head();
+        if (node == null || node.next == null) {
+            return nodeContainer;
+        }
+
+        Node<T> leftEnd = node;
+        Node<T> rightStart = node;
+        Node<T> rightEnd = node;
+
+        while (rightEnd != null && rightEnd.next != null) {
+            leftEnd = rightStart;
+            rightStart = rightStart.next;
+            rightEnd = rightEnd.next.next;
+        }
+
+        leftEnd.next = null;
+
+        NodeContainer<T> leftSide = sorted(new NodeContainer<>(node, null), comparator);
+        NodeContainer<T> rightSide = sorted(new NodeContainer<>(rightStart, null), comparator);
+
+        return mergeNodes(leftSide.head(), rightSide.head(), comparator);
+    }
+
+}
+
+record NodeContainer<T>(Node<T> head, Node<T> tail) {
 
 }
 

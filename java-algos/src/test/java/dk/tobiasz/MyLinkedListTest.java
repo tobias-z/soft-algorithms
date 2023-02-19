@@ -2,6 +2,7 @@ package dk.tobiasz;
 
 import static org.junit.jupiter.api.Assertions.fail;
 
+import java.util.Comparator;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -129,6 +130,29 @@ class MyLinkedListTest {
         System.out.println("\n");
         System.out.println(list.getFirst());
         System.out.println(list.getLast());
+    }
+
+    @Test
+    @DisplayName("merge sorted lists")
+    void mergeSortedLists() throws Exception {
+        MyLinkedList<Integer> list1 = new MyLinkedList<>();
+        list1.addLast(1);
+        list1.addLast(2);
+        list1.addLast(3);
+        list1.addLast(4);
+        list1.addLast(7);
+
+        MyLinkedList<Integer> list2 = new MyLinkedList<>();
+        list2.addLast(-5);
+        list2.addLast(-2);
+        list2.addLast(0);
+        list2.addLast(10);
+        list2.addLast(17);
+
+        MyLinkedList<Integer> mergedList = MyLinkedList.mergeSortedLinkedList(list1, list2,
+            Comparator.comparingInt(o -> o));
+
+        mergedList.printList();
     }
 
 }

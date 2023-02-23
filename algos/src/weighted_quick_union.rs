@@ -16,11 +16,11 @@ impl UF {
         }
     }
 
-    fn connected(self: &mut Self, p: usize, q: usize) -> bool {
+    fn connected(&mut self, p: usize, q: usize) -> bool {
         self.find_root(p) == self.find_root(q)
     }
 
-    fn find_root(self: &mut Self, n: usize) -> usize {
+    fn find_root(&mut self, n: usize) -> usize {
         let val = self.ids[n];
         if val == n {
             return val;
@@ -32,7 +32,7 @@ impl UF {
     }
 
     // Ensure that we have smaller trees by always linking the smaller tree to the bigger one
-    fn union(self: &mut Self, p: usize, q: usize) -> () {
+    fn union(&mut self, p: usize, q: usize) {
         let p_root = self.find_root(p);
         let q_root = self.find_root(q);
         if p_root == q_root {

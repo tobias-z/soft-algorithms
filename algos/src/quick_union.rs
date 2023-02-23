@@ -11,11 +11,11 @@ impl UF {
         Self { ids }
     }
 
-    fn connected(self: &Self, p: usize, q: usize) -> bool {
+    fn connected(&self, p: usize, q: usize) -> bool {
         self.find_root(p) == self.find_root(q)
     }
 
-    fn find_root(self: &Self, n: usize) -> usize {
+    fn find_root(&self, n: usize) -> usize {
         let val = self.ids[n];
         if val == n {
             return val;
@@ -23,7 +23,7 @@ impl UF {
         self.find_root(val)
     }
 
-    fn union(mut self: Self, p: usize, q: usize) -> Self {
+    fn union(mut self, p: usize, q: usize) -> Self {
         let p_root = self.find_root(p);
         let q_root = self.find_root(q);
         self.ids[p_root] = q_root;

@@ -13,12 +13,12 @@ impl UF {
     }
 
     // O(1) since we dont have to loop the array to find out of something is connected
-    fn connected(self: &Self, p: usize, q: usize) -> bool {
+    fn connected(&self, p: usize, q: usize) -> bool {
         self.ids[p] == self.ids[q]
     }
 
     // O(N). The operations increase depending on the amount of elements in the list
-    fn union(mut self: Self, p: usize, q: usize) -> Self {
+    fn union(mut self, p: usize, q: usize) -> Self {
         let p_val = self.ids[p];
         let q_val = self.ids[q];
         for i in 0..self.ids.len() {

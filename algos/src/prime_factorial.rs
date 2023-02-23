@@ -26,7 +26,7 @@ pub fn prime_factorial(n: usize) -> Vec<usize> {
 }
 
 fn has_decimals(n: usize) -> bool {
-    n % 1 != 0
+    n as f64 % 1.0 != 0.0
 }
 
 // a prime number has only two factors. The number itself and 1.
@@ -39,7 +39,7 @@ fn is_prime(n: usize) -> bool {
             return false;
         }
     }
-    return true;
+    true
 }
 
 #[cfg(test)]

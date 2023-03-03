@@ -1,6 +1,7 @@
 package dk.tobiasz;
 
 import java.util.Comparator;
+import java.util.Queue;
 
 public class MyLinkedList<T> {
 
@@ -127,6 +128,7 @@ public class MyLinkedList<T> {
     // Upper O(1)
     // Lower O(1)
     public void removeLast() {
+        Queue
         tail.prev.next = null;
         tail = tail.prev;
     }

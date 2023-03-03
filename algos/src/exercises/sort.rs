@@ -22,7 +22,7 @@ fn sort(mut arr: Vec<usize>) -> Vec<usize> {
             arr[i] = prev
         }
     }
-    return arr;
+    arr
 }
 
 fn bubble_sort(mut arr: Vec<usize>) -> Vec<usize> {
@@ -36,7 +36,7 @@ fn bubble_sort(mut arr: Vec<usize>) -> Vec<usize> {
             }
         }
     }
-    return arr;
+    arr
 }
 
 fn string_number_bubble_sort(mut arr: Vec<String>) -> Vec<String> {
@@ -46,11 +46,9 @@ fn string_number_bubble_sort(mut arr: Vec<String>) -> Vec<String> {
             let next = arr.get(j + 1).unwrap().to_owned();
             let curr_is_n = is_number(&curr);
             let next_is_n = is_number(&next);
-            if curr_is_n && next_is_n {
-                if arr[j] > arr[j + 1] {
-                    arr[j] = next.clone();
-                    arr[j + 1] = curr.clone();
-                }
+            if curr_is_n && next_is_n && arr[j] > arr[j + 1] {
+                arr[j] = next.clone();
+                arr[j + 1] = curr.clone();
             }
             if !curr_is_n && next_is_n {
                 arr[j] = next.clone();
@@ -59,18 +57,19 @@ fn string_number_bubble_sort(mut arr: Vec<String>) -> Vec<String> {
             if curr_is_n && !next_is_n {
                 continue;
             }
-            if !curr_is_n && !next_is_n {
-                if curr.chars().next().unwrap() > next.chars().next().unwrap() {
-                    arr[j] = next.clone();
-                    arr[j + 1] = curr.clone();
-                }
+            if !curr_is_n
+                && !next_is_n
+                && curr.chars().next().unwrap() > next.chars().next().unwrap()
+            {
+                arr[j] = next.clone();
+                arr[j + 1] = curr.clone();
             }
         }
     }
     arr
 }
 
-fn is_number(curr: &String) -> bool {
+fn is_number(curr: &str) -> bool {
     for c in curr.chars() {
         if !c.is_numeric() {
             return false;

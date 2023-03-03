@@ -217,9 +217,10 @@ public class MyArrayList<T> {
         private Node left;
         private Node right;
 
+
         Node(T val, int i) {
             this.val = val;
-            this.index = i;
+            index = i;
         }
     }
 }

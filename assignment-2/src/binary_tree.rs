@@ -1,3 +1,5 @@
+use std::cmp::Ordering;
+
 #[derive(Debug, Clone)]
 pub struct Node<T>
 where
@@ -64,13 +66,83 @@ where
             }
             (Some(right), Some(left)) if compare(val, &left.val) > 0 => right.insert(val, compare),
             (Some(right), Some(left)) if compare(val, &right.val) < 0 => left.insert(val, compare),
-            (Some(_), Some(left)) => left.insert(val, compare),
-            (Some(right), None) => right.insert(val, compare),
             (None, None) => {
                 self.right = Box::new(Some(Node::new(val.clone())));
                 true
             }
+            _ => false,
         }
+    }
+
+    // If:
+    //  Left = None && Right = Some -> point val to Right and delete curr node
+    //  Left = Some && Right = None -> point val to Left and delete curr node
+    //  Left = Some && Right = Some -> move smallest from right to curr
+    pub fn delete<F>(mut self, val: &T, compare: &F) -> Option<Node<T>>
+    where
+        F: Fn(&T, &T) -> i32,
+    {
+        let compared = compare(val, &self.val);
+        if self.right.is_some() && self.left.is_none() {
+            let right = (*self.right).as_mut().unwrap();
+            match compared.cmp(&0) {
+                Ordering::Equal => {
+                    self.left = right.left.clone();
+                    self.right = right.right.clone();
+                    self.val = val.clone();
+                    return Some(self);
+                }
+                Ordering::Greater => {
+                    self.right = Box::new(self.right.unwrap().delete(val, compare));
+                    return *self.right;
+                }
+                Ordering::Less => return None,
+            }
+        }
+        if self.right.is_none() && self.left.is_some() {
+            let left = (*self.left).as_mut().unwrap();
+            match compared.cmp(&0) {
+                Ordering::Equal => {
+                    self.right = left.right.clone();
+                    self.left = left.left.clone();
+                    self.val = val.clone();
+                    return Some(self);
+                }
+                Ordering::Less => {
+                    self.left = Box::new(self.left.unwrap().delete(val, compare));
+                    return *self.left;
+                }
+                Ordering::Greater => return None,
+            }
+        }
+        if self.right.is_some() && self.left.is_some() {
+            match compared.cmp(&0) {
+                Ordering::Equal => {
+                    // Move smallest from right to curr
+                    let smallest: Node<T> =
+                        Node::<T>::get_smallest((*self.right).as_ref().unwrap());
+                    self.right.unwrap().delete(&smallest.val, compare);
+                    self.val = smallest.val;
+                    return None;
+                }
+                Ordering::Less => {
+                    self.left = Box::new(self.left.unwrap().delete(val, compare));
+                    return *self.left;
+                }
+                Ordering::Greater => {
+                    self.right = Box::new(self.right.unwrap().delete(val, compare));
+                    return *self.right;
+                }
+            }
+        }
+        None
+    }
+
+    fn get_smallest(node: &Node<T>) -> Node<T> {
+        if node.left.is_some() {
+            return Node::<T>::get_smallest((*node.left).as_ref().unwrap());
+        }
+        node.clone()
     }
 }
 

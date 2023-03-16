@@ -1,5 +1,7 @@
 # Hash Tables Exercises – coding can be in a language of your choice
 
+Example code has been implemented. See [this simple example](./src/hash_table.rs) for an understanding of a basic hash table.
+
 ## 1) Describe with examples 2 different collision handling methods for inserting new entries into a hash table
 
 Collision handling is necessary when a key is run through the hash function, but the hash is the same as another already present using a different key.

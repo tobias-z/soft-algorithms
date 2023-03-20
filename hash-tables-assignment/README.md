@@ -41,7 +41,7 @@ A bloom filter used to figure out if something has been seen before. However, A 
 A bloom filter works like this:
 
 1. Given a key
-2. Run the key through __multiple__ hash functions, which all give different results.
+2. Run the key through **multiple** hash functions, which all give different results.
 3. Check if all the keys are stored yet. If one of them are not, we have not seen that key yet.
 
 A bloom filter is called approximate, because it may produce false positives.

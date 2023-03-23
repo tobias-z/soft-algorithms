@@ -1,0 +1,21 @@
+version: "3.9"
+
+volumes:
+  data:
+
+services:
+  postgres:
+    image: postgres:latest
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+  app:
+    depends_on:
+      - postgres
+    build: .
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env.dev

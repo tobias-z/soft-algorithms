@@ -1,125 +1,112 @@
-use std::{cell::RefCell, rc::Rc, cmp::Ordering};
+use std::{cmp::Ordering, ptr::addr_of_mut};
 
-struct LeafNode {
+#[derive(Debug)]
+struct LeafNode<'a> {
     pub data: usize,
-    parent: Option<Rc<RefCell<Node>>>,
+    parent: Option<*mut Node<'a>>,
 }
 
-struct TwoNode {
+#[derive(Debug)]
+struct TwoNode<'a> {
     pub data: usize,
-    parent: Option<Rc<RefCell<Node>>>,
-    left: Option<Rc<RefCell<Node>>>,
-    right: Option<Rc<RefCell<Node>>>,
+    parent: Option<*mut Node<'a>>,
+    left: Option<*mut Node<'a>>,
+    right: Option<*mut Node<'a>>,
 }
 
-struct ThreeNode {
+#[derive(Debug)]
+struct ThreeNode<'a> {
     small: usize,
     large: usize,
-    parent: Option<Rc<RefCell<Node>>>,
-    left: Option<Rc<RefCell<Node>>>,
-    middle: Option<Rc<RefCell<Node>>>,
-    right: Option<Rc<RefCell<Node>>>,
+    parent: Option<*mut Node<'a>>,
+    left: Option<*mut Node<'a>>,
+    middle: Option<*mut Node<'a>>,
+    right: Option<*mut Node<'a>>,
 }
 
-enum Node {
-    LeafNode(LeafNode),
-    TwoNode(TwoNode),
-    ThreeNode(ThreeNode),
+#[derive(Debug)]
+enum Node<'a> {
+    Leaf(LeafNode<'a>),
+    Two(TwoNode<'a>),
+    Three(ThreeNode<'a>),
 }
 
-struct TwoThreeTree {
-    root: Option<Rc<RefCell<Node>>>,
+struct TwoThreeTree<'a> {
+    root: Option<*mut Node<'a>>,
+    // The nodes array is used for us to store each the nodes somewhere, this lets us create
+    // pointers to them. In reality this should prob be a hashmap where the key is the value of the
+    // data and the value is a linkedlist with all nodes holding that data. This would allow us to
+    // easily handle deletion of nodes, without having to traverse the whole tree.
+    nodes: Vec<Node<'a>>,
 }
 
-impl TwoThreeTree {
-    fn new() -> Self {
-        Self { root: None }
+impl<'a> TwoThreeTree<'a> {
+    fn new() -> TwoThreeTree<'a> {
+        Self {
+            root: None,
+            nodes: vec![],
+        }
     }
 
     pub fn insert(&mut self, data: usize) {
-        match self.root.to_owned() {
+        match self.root {
             Some(root) => {
                 TwoThreeTree::insert_in_node(data, root);
             }
             None => {
-                self.root = Some(Rc::new(RefCell::new(Node::LeafNode(LeafNode { data, parent: None }))));
+                let mut node: Node<'a> = Node::Leaf(LeafNode { data, parent: None });
+                let node_ptr = addr_of_mut!(node);
+                self.nodes.push(node);
+                self.root = Some(node_ptr);
             }
         }
     }
 
-    fn insert_in_node(data: usize, node: Rc<RefCell<Node>>) {
-        match *node.borrow() {
-            Node::LeafNode(leaf) => {
-                // If we hit a leaf, we should insert it here. Making the leaf a TwoNode
-                match leaf.parent {
-                    Some(parent) => {
-                        match &mut *parent.borrow_mut() {
-                            Node::LeafNode(_) => panic!("This should never be the case"),
-                            Node::TwoNode(parent) if leaf.data > parent.data => {
-                                // if larger we know that our leaf is the parents right node
-                                let small = smallest(data, leaf.data);
-                                let large = largest(data, leaf.data);
-                                parent.right = Some(Rc::new(RefCell::new(Node::ThreeNode(ThreeNode { small, large, parent: leaf.parent, left: None, middle: None, right: None }))));
-                            },
-                            Node::TwoNode(parent) => {
-                                // if less we know that our leaf is the parents left node
-                            },
-                            Node::ThreeNode(parent) => {
+    fn insert_in_node(data: usize, node: *mut Node<'a>) {}
 
-                            },
-                        }
-                    },
-                    None => {
-                        // if we do not have a parent that means we are dealing with the root node. therefor we modify self.root
-                        let small = smallest(data, leaf.data);
-                        let large = largest(data, leaf.data);
-                        node = Rc::new(RefCell::new(Node::ThreeNode(ThreeNode { small, large, parent: None, left: None, middle: None, right: None })));
-                    },
-                }
-            }
-            Node::TwoNode(_) => todo!(),
-            Node::ThreeNode(_) => todo!(),
-        }
-    }
-
-    pub fn find(&self, data: usize) -> Option<Rc<RefCell<Node>>> {
-        match self.root.as_ref() {
+    pub fn find(&self, data: usize) -> Option<*mut Node<'a>> {
+        match self.root {
             Some(root) => TwoThreeTree::binary_search(data, root),
             None => None,
         }
     }
 
-    fn binary_search(data: usize, node: &Rc<RefCell<Node>>) -> Option<Rc<RefCell<Node>>> {
-        match &*node.borrow() {
-            Node::LeafNode(leaf) => {
-                if data == leaf.data {
-                    return Some(Rc::clone(node));
-                }
-                None
+    fn binary_search(data: usize, node: *mut Node<'a>) -> Option<*mut Node<'a>> {
+        unsafe {
+            match node.as_ref() {
+                Some(n) => match n {
+                    Node::Leaf(leaf) => {
+                        if data == leaf.data {
+                            return Some(node);
+                        }
+                        None
+                    }
+                    Node::Two(two) if data == two.data => Some(node),
+                    Node::Two(two) if data > two.data => match two.right {
+                        Some(right) => TwoThreeTree::binary_search(data, right),
+                        None => None,
+                    },
+                    Node::Two(two) => match two.left {
+                        Some(left) => TwoThreeTree::binary_search(data, left),
+                        None => None,
+                    },
+                    Node::Three(three) if data == three.small => Some(node),
+                    Node::Three(three) if data == three.large => Some(node),
+                    Node::Three(three) if data > three.large => match three.right {
+                        Some(right) => TwoThreeTree::binary_search(data, right),
+                        None => None,
+                    },
+                    Node::Three(three) if data < three.small => match three.left {
+                        Some(left) => TwoThreeTree::binary_search(data, left),
+                        None => None,
+                    },
+                    Node::Three(three) => match three.middle {
+                        Some(middle) => TwoThreeTree::binary_search(data, middle),
+                        None => None,
+                    },
+                },
+                None => None,
             }
-            Node::TwoNode(two) if data == two.data => Some(Rc::clone(node)),
-            Node::TwoNode(two) if data > two.data => match &two.right {
-                Some(right) => TwoThreeTree::binary_search(data, right),
-                None => None,
-            },
-            Node::TwoNode(two) => match &two.left {
-                Some(left) => TwoThreeTree::binary_search(data, left),
-                None => None,
-            },
-            Node::ThreeNode(three) if data == three.small => Some(Rc::clone(node)),
-            Node::ThreeNode(three) if data == three.large => Some(Rc::clone(node)),
-            Node::ThreeNode(three) if data > three.large => match &three.right {
-                Some(right) => TwoThreeTree::binary_search(data, right),
-                None => None,
-            },
-            Node::ThreeNode(three) if data < three.small => match &three.left {
-                Some(left) => TwoThreeTree::binary_search(data, left),
-                None => None,
-            },
-            Node::ThreeNode(three) => match &three.middle {
-                Some(middle) => TwoThreeTree::binary_search(data, middle),
-                None => None,
-            },
         }
     }
 }
@@ -142,12 +129,20 @@ pub fn largest(x: usize, y: usize) -> usize {
 
 #[cfg(test)]
 mod test {
+    use std::{thread, time::Duration};
+
     use super::*;
 
     #[test]
     fn can_insert_root() {
-        let mut tree = TwoThreeTree::new();
-        tree.insert(7);
-        assert!(tree.find(7).is_some());
+        // assert!(tree.find(7).is_some());
+        unsafe {
+            let mut tree = TwoThreeTree::new();
+            tree.insert(7);
+            let x = tree.find(7).unwrap();
+            if let Node::Leaf(leaf) = &*x.as_mut().unwrap() {
+                println!("{:?}", leaf.data);
+            }
+        }
     }
 }

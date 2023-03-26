@@ -176,7 +176,6 @@ mod test {
     #[test]
     fn can_create_tree() {
         let root = create_tree(vec![1, 2, 3, 4, 5]).unwrap();
-        println!("{:?}", root);
         assert_eq!(root.val, 3);
     }
 

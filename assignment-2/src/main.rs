@@ -12,14 +12,14 @@ enum X {
 
 fn main() {
     println!("Crypt1 --------------");
-    ceasar_decoder::decrypt("Crypt1.txt");
+    ceasar_decoder::decode("Crypt1.txt");
     println!("Crypt1 --------------");
 
     println!("Crypt2 --------------");
-    ceasar_decoder::decrypt("Crypt2.txt");
+    ceasar_decoder::decode("Crypt2.txt");
     println!("Crypt2 --------------");
 
     println!("Crypt3 --------------");
-    ceasar_decoder::decrypt("Crypt3.txt");
+    ceasar_decoder::decode("Crypt3.txt");
     println!("Crypt3 --------------");
 }

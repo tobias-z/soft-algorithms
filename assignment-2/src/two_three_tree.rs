@@ -1,47 +1,47 @@
 use std::{cmp::Ordering, ptr::addr_of_mut};
 
 #[derive(Debug)]
-struct LeafNode<'a> {
+struct LeafNode {
     pub data: usize,
-    parent: Option<*mut Node<'a>>,
+    parent: Option<*mut Node>,
 }
 
 #[derive(Debug)]
-struct TwoNode<'a> {
+struct TwoNode {
     pub data: usize,
-    parent: Option<*mut Node<'a>>,
-    left: Option<*mut Node<'a>>,
-    right: Option<*mut Node<'a>>,
+    parent: Option<*mut Node>,
+    left: Option<*mut Node>,
+    right: Option<*mut Node>,
 }
 
 #[derive(Debug)]
-struct ThreeNode<'a> {
+struct ThreeNode {
     small: usize,
     large: usize,
-    parent: Option<*mut Node<'a>>,
-    left: Option<*mut Node<'a>>,
-    middle: Option<*mut Node<'a>>,
-    right: Option<*mut Node<'a>>,
+    parent: Option<*mut Node>,
+    left: Option<*mut Node>,
+    middle: Option<*mut Node>,
+    right: Option<*mut Node>,
 }
 
 #[derive(Debug)]
-enum Node<'a> {
-    Leaf(LeafNode<'a>),
-    Two(TwoNode<'a>),
-    Three(ThreeNode<'a>),
+enum Node {
+    Leaf(LeafNode),
+    Two(TwoNode),
+    Three(ThreeNode),
 }
 
-struct TwoThreeTree<'a> {
-    root: Option<*mut Node<'a>>,
+struct TwoThreeTree {
+    root: Option<*mut Node>,
     // The nodes array is used for us to store each the nodes somewhere, this lets us create
     // pointers to them. In reality this should prob be a hashmap where the key is the value of the
     // data and the value is a linkedlist with all nodes holding that data. This would allow us to
     // easily handle deletion of nodes, without having to traverse the whole tree.
-    nodes: Vec<Node<'a>>,
+    nodes: Vec<Node>,
 }
 
-impl<'a> TwoThreeTree<'a> {
-    fn new() -> TwoThreeTree<'a> {
+impl TwoThreeTree {
+    fn new() -> TwoThreeTree {
         Self {
             root: None,
             nodes: vec![],
@@ -54,7 +54,7 @@ impl<'a> TwoThreeTree<'a> {
                 TwoThreeTree::insert_in_node(data, root);
             }
             None => {
-                let mut node: Node<'a> = Node::Leaf(LeafNode { data, parent: None });
+                let mut node: Node = Node::Leaf(LeafNode { data, parent: None });
                 let node_ptr = addr_of_mut!(node);
                 self.nodes.push(node);
                 self.root = Some(node_ptr);
@@ -62,16 +62,16 @@ impl<'a> TwoThreeTree<'a> {
         }
     }
 
-    fn insert_in_node(data: usize, node: *mut Node<'a>) {}
+    fn insert_in_node(data: usize, node: *mut Node) {}
 
-    pub fn find(&self, data: usize) -> Option<*mut Node<'a>> {
+    pub fn find(&self, data: usize) -> Option<*mut Node> {
         match self.root {
             Some(root) => TwoThreeTree::binary_search(data, root),
             None => None,
         }
     }
 
-    fn binary_search(data: usize, node: *mut Node<'a>) -> Option<*mut Node<'a>> {
+    fn binary_search(data: usize, node: *mut Node) -> Option<*mut Node> {
         unsafe {
             match node.as_ref() {
                 Some(n) => match n {
@@ -129,8 +129,6 @@ pub fn largest(x: usize, y: usize) -> usize {
 
 #[cfg(test)]
 mod test {
-    use std::{thread, time::Duration};
-
     use super::*;
 
     #[test]

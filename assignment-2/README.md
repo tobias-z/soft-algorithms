@@ -14,7 +14,7 @@ By Tobias Zimmermann (cph-tz11@cphbusiness.dk)
     - [Binary Tree](#binary-tree)
     - [Two Three Tree](#two-three-tree)
     - [Red Black Tree](#red-black-tree)
-  - [Small algorithms project](#small-algorithms-project)
+  - [Caesar cipher](#caesar-cipher)
 
 ## Introduction
 

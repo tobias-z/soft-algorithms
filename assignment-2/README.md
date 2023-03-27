@@ -59,11 +59,11 @@ Insertion into a two three tree works as follows:
 
 Imagine that we want to insert the numbers 30, 10, 50, 70 and 20 in the tree
 
-30: 30 becomes the root node as a leaf node.
-10: the root node becomes a three node where 10 on the left and 30 is on the right.
-50: 30 becomes the new root node as a two node, where its right node is a leaf node containing 50 and its left is a leaf node containing 10.
-70: the leaf node containing 50 becomes a three node where the left data is 50 and the right is 70.
-20: the leaf node containing 10 becomes a three node where the left data is 10 and the right is 20.
+- 30: 30 becomes the root node as a leaf node.
+- 10: the root node becomes a three node where 10 on the left and 30 is on the right.
+- 50: 30 becomes the new root node as a two node, where its right node is a leaf node containing 50 and its left is a leaf node containing 10.
+- 70: the leaf node containing 50 becomes a three node where the left data is 50 and the right is 70.
+- 20: the leaf node containing 10 becomes a three node where the left data is 10 and the right is 20.
 
 You then end up with a tree looking like this:
 
@@ -100,25 +100,26 @@ Rebalancing rules are:
 
 Example of inserting nodes `5, 10, 7, 8`:
 
-5: 5 is inserted as a red node, and then recoloured to black because it is the root node
-10: 10 is inserted on the right of 5 as red
-7:
+- 5: 5 is inserted as a red node, and then recoloured to black because it is the root node
+- 10: 10 is inserted on the right of 5 as red
+- 7:
 
-- 7 is inserted on the left of 10 as red.
-- Because we now have two red nodes we are violating the rules of the tree.
-- The uncle of our recently inserted node is null, so we consider it black meaning we have to rotate.
-- The current imbalance is a right to left imbalance, because 5 goes right then 10 goes left. So we have to do a right-left rotate.
-- 7 becomes the grandparent, 10 goes to the right of 7 and 5 goes to the left of 7.
-- We then have to recolour because 7 and 10 are still two reds in a row.
-- 7 becomes black, and both children become red (as the rebalancing rules also state)
-  8:
-- 8 is inserted to the left of 10 as red.
-- Because we now have two red nodes we are violating the rules of the tree.
-- The uncle of our recently inserted node is red, meaning we have to colour flip.
-- Colour flipping the grandparent, so that 7 becomes red, 5 black, 10 black, and 8 red.
-- We now have a violation in that the root node is red. So we change it to black.
+  - 7 is inserted on the left of 10 as red.
+  - Because we now have two red nodes we are violating the rules of the tree.
+  - The uncle of our recently inserted node is null, so we consider it black meaning we have to rotate.
+  - The current imbalance is a right to left imbalance, because 5 goes right then 10 goes left. So we have to do a right-left rotate.
+  - 7 becomes the grandparent, 10 goes to the right of 7 and 5 goes to the left of 7.
+  - We then have to recolour because 7 and 10 are still two reds in a row.
+  - 7 becomes black, and both children become red (as the rebalancing rules also state)
 
-And the cycle continues... However, there will be times when the problem tree is incorrect, but not at the place of insertion. (Like the example above with our root colour).
+- 8:
+  - 8 is inserted to the left of 10 as red.
+  - Because we now have two red nodes we are violating the rules of the tree.
+  - The uncle of our recently inserted node is red, meaning we have to colour flip.
+  - Colour flipping the grandparent, so that 7 becomes red, 5 black, 10 black, and 8 red.
+  - We now have a violation in that the root node is red. So we change it to black.
+
+And the cycle continues... HOWEVER, there will be times when the problem tree is incorrect, but not at the place of insertion. (Like the example above with our root colour).
 This means that after each insertion, we have to recursively check the parents for inconsistencies with the rules of our tree.
 If an inconsistency is found we use the same rebalancing rules used when inserting the node. So either rotate or colour flip.
 

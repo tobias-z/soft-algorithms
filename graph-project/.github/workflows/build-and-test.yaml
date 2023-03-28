@@ -1,0 +1,50 @@
+on:
+  push:
+
+name: Build and Test
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
+
+      - name: Setup rust
+        uses: ./.github/actions/setup-rust
+
+      - name: Install nextest
+        uses: taiki-e/install-action@ddfbd2cab72fd94842c80ade93f28fe7ee9c71f8
+
+      - name: Run cargo test
+        shell: bash
+        run: cargo nextest run --workspace
+  check:
+    name: Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
+
+      - name: Setup rust
+        uses: ./.github/actions/setup-rust
+
+      - name: Run cargo build
+        shell: bash
+        run: cargo build --workspace
+
+      - name: Run cargo clippy
+        shell: bash
+        run: cargo clippy --workspace
+
+      - name: Run format check
+        shell: bash
+        run: cargo fmt --check
+
+      - name: Run dependabot check
+        shell: bash
+        run: |
+          cargo install --path ./hack/dependabot --quiet
+          dependabot check

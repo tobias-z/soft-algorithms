@@ -1,9 +1,15 @@
 on:
   push:
+    branches:
+      - main
+      - develop
     paths:
       - graph-project
 
 name: Build and Test
+
+env:
+  PROJECT_NAME: graph-project
 
 permissions:
   contents: read
@@ -54,3 +60,24 @@ jobs:
         run: |
           cargo install --path ./hack/dependabot --quiet
           dependabot check
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    needs:
+      - test
+      - check
+    steps:
+      - uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
+
+      - name: deploy to dockerhub
+        env:
+          DOCKER_USERNAME: tobiaszimmer
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+        if: ${{ github.event_name != 'pull_request' }}
+        run: |
+          version=$(head "$PROJECT_NAME/Cargo.toml" | grep version | head -n 1 | tr 'version = "' " " | xargs | awk '{print tolower($0)}')
+          project_name=$(head "$PROJECT_NAME/Cargo.toml" | grep name | head -n 1 | tr 'name = "' " " | xargs | awk '{print tolower($0)}')
+          echo "$DOCKER_PASSWORD" | docker login --username $DOCKER_USERNAME --password-stdin
+          docker build --tag "$DOCKER_USERNAME/graph-project:$version" .
+          docker push "$DOCKER_USERNAME/graph-project:$version"

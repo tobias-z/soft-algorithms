@@ -54,12 +54,6 @@ jobs:
       - name: Run format check
         shell: bash
         run: cargo fmt --check
-
-      - name: Run dependabot check
-        shell: bash
-        run: |
-          cargo install --path ./hack/dependabot --quiet
-          dependabot check
   deploy:
     name: Deploy
     runs-on: ubuntu-latest

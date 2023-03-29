@@ -1,0 +1,13 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: $GRAPH_PROJECT_POSTGRES_USERNAME
+      POSTGRES_PASSWORD: $GRAPH_PROJECT_POSTGRES_PASSWORD
+  app:
+    container_name: graph-project
+    image: tobiaszimmer/graph-project:$PROJECT_VERSION
+    env_file:
+      - .env.prod

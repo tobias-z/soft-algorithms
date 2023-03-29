@@ -9,7 +9,7 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
   app:
-    image: tobiaszimmer/graph-project:latest
+    image: tobiaszimmer/graph-project:0.1.0
     ports:
       - "8080:8080"
     env_file:

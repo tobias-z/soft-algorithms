@@ -1,6 +1,6 @@
 [package]
 name = "graph-project"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 description = "This graph project was given to us at CphBusiness. It is supposed to make us learn about different algorithms in graph theory"
 authors = ["Tobias Zimmermann <tobias.zimmer007@gmail.com>"]

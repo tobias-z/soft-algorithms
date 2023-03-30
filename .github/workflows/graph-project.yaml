@@ -79,4 +79,4 @@ jobs:
           curl --request POST \
             --url $SERVER_URL/simple-cd/deploy \
             --header 'Content-Type: application/json' \
-            --data "{\"name\": \"$project_name\", \"giturl\": \"$GITURL\", \"token\": \"$TOKEN\", \"downdir\": \"graph-project\", \"invalidate_images\": [\"$image_name\"]\, \"project_version\": \"$version\"}"
+            --data "{\"name\": \"$project_name\", \"giturl\": \"$GITURL\", \"token\": \"$TOKEN\", \"downdir\": \"graph-project\", \"invalidate_images\": [\"$image_name\"], \"project_version\": \"$version\"}"

@@ -1,3 +1,4 @@
 fn main() {
-    println!("Hello, world! {}", db::add(1, 2));
+    dotenv::dotenv().ok();
+    println!("Hello, world!");
 }

@@ -1,6 +1,6 @@
 CREATE TABLE road (
     id BIGSERIAL PRIMARY KEY,
-    road_name VARCHAR(100)
+    road_name VARCHAR(100) NOT NULL
 );
 
 CREATE TABLE road_part (
@@ -9,7 +9,7 @@ CREATE TABLE road_part (
     FOREIGN KEY (road_id) REFERENCES road (id)
 );
 
-CREATE TABLE road_pard_relation (
+CREATE TABLE road_part_relation (
     part_one BIGSERIAL NOT NULL,
     part_two BIGSERIAL NOT NULL,
     weight INT NOT NULL,

@@ -1,9 +1,9 @@
 # To do
 
 - [] Data
-  - [] create structure in relational database that can be used for a graph
-  - [] create database with data
-  - [] load data from database into a usable model
+  - [x] create structure in relational database that can be used for a graph
+  - [x] create database with data
+  - [x] load data from database into a usable model
   - [] document the data we use and the process of creating the data
 - [] Map implementation
   - [] street map / indoor map. We can prob find some way to make this into one algorithm

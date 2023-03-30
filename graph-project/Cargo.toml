@@ -10,6 +10,7 @@ repository = "https://github.com/tobias-z/soft-algorithms/graph-project"
 
 [dependencies]
 db = { path = "crates/db" }
+dotenv = "0.15.0"
 
 [[bin]]
 name = "graph-server"
@@ -17,5 +18,6 @@ path = "src/graph-server/main.rs"
 
 [workspace]
 members = [
-    "crates/db"
+    "crates/db",
+    "crates/map",
 ]

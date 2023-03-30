@@ -1,13 +1,23 @@
 version: "3.9"
 
 services:
-  postgres:
+  $GRAPH_PROJECT_POSTGRES_HOST:
     image: postgres:latest
     environment:
       POSTGRES_USER: $GRAPH_PROJECT_POSTGRES_USERNAME
       POSTGRES_PASSWORD: $GRAPH_PROJECT_POSTGRES_PASSWORD
+    networks:
+      - prod
   app:
     container_name: graph-project
     image: tobiaszimmer/graph-project:$PROJECT_VERSION
     env_file:
       - .env.prod
+    depends_on:
+      - $GRAPH_PROJECT_POSTGRES_HOST
+    networks:
+      - prod
+
+networks:
+  prod:
+    external: true

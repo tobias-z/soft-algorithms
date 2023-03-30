@@ -61,14 +61,22 @@ jobs:
     steps:
       - uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
 
-      - name: deploy to dockerhub
+      - name: deploy to docker up and server
         env:
           DOCKER_USERNAME: tobiaszimmer
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+          GITURL: https://github.com/${{ github.repository }}
+          TOKEN: ${{ secrets.TOKEN }}
+          SERVER_URL: ${{ secrets.SERVER_URL }}
         if: ${{ github.event_name != 'pull_request' }}
         run: |
           version=$(head "Cargo.toml" | grep version | head -n 1 | tr 'version = "' " " | xargs | awk '{print tolower($0)}')
-          project_name=$(head "Cargo.toml" | grep name | head -n 1 | tr 'name = "' " " | xargs | awk '{print tolower($0)}')
+          project_name=$(head "Cargo.toml" | grep name | head -n 1 | sed 's/"//g' | sed 's/name = //g' | xargs | awk '{print tolower($0)}')
           echo "$DOCKER_PASSWORD" | docker login --username $DOCKER_USERNAME --password-stdin
-          docker build --tag "$DOCKER_USERNAME/graph-project:$version" .
-          docker push "$DOCKER_USERNAME/graph-project:$version"
+          docker build --tag "$DOCKER_USERNAME/$project_name:$version" .
+          image_name="$DOCKER_USERNAME/$project_name:$version"
+          docker push "$image_name"
+          curl --request POST \
+            --url $SERVER_URL/simple-cd/deploy \
+            --header 'Content-Type: application/json' \
+            --data "{\"name\": \"$project_name\", \"giturl\": \"$GITURL\", \"token\": \"$TOKEN\", \"downdir\": \"graph-project\", \"invalidate_images\": [\"$image_name\"]\, \"project_version\": \"$version\"}"

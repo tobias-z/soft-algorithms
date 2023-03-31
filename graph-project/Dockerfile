@@ -6,7 +6,7 @@ RUN rustup target add wasm32-unknown-unknown
 RUN apt update && apt install pkg-config libssl-dev -y
 RUN cargo install cargo-leptos
 RUN cargo leptos build --release
-RUN cargo install refinery_cli
+RUN cargo install refinery_cli --no-default-features --features=postgresql
 
 FROM debian:11-slim
 RUN mkdir -p /opt/graph-project/target/site

@@ -6,13 +6,15 @@ services:
     environment:
       POSTGRES_USER: $GRAPH_PROJECT_POSTGRES_USERNAME
       POSTGRES_PASSWORD: $GRAPH_PROJECT_POSTGRES_PASSWORD
+      POSTGRES_DB: $GRAPH_PROJECT_POSTGRES_DATABASE
     networks:
       - prod
     healthcheck:
-      test: ["CMD", "pg_isready"]
-      interval: 10s
-      timeout: 2s
-      retries: 10
+      test: ["CMD-SHELL", "pg_isready", "-d", "$GRAPH_PROJECT_POSTGRES_DATABASE"]
+      interval: 30s
+      timeout: 60s
+      retries: 5
+      start_period: 80s
   app:
     container_name: graph-project
     image: tobiaszimmer/graph-project:$PROJECT_VERSION

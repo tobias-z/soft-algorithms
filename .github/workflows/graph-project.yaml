@@ -28,6 +28,12 @@ jobs:
       - name: Start test containers
         run: docker compose up -d
 
+      - name: Install refinery
+        run: cargo install refinery_cli --no-default-features --features=postgresql
+
+      - name: Run migration scripts
+        run: DB_PATH="postgres://postgres:postgres@localhost:5432/postgres" refinery migrate -e DB_PATH -p /migrations
+
       - name: Install nextest
         uses: taiki-e/install-action@ddfbd2cab72fd94842c80ade93f28fe7ee9c71f8
 
@@ -45,6 +51,12 @@ jobs:
 
       - name: Start test containers
         run: docker compose up -d
+
+      - name: Install refinery
+        run: cargo install refinery_cli --no-default-features --features=postgresql
+
+      - name: Run migration scripts
+        run: DB_PATH="postgres://postgres:postgres@localhost:5432/postgres" refinery migrate -e DB_PATH -p /migrations
 
       - name: Run cargo build
         shell: bash

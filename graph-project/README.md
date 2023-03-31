@@ -1,3 +1,3 @@
 # Graph Project
 
-editt to readme
+edit to readme

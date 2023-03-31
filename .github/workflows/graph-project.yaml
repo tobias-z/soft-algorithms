@@ -29,7 +29,7 @@ jobs:
         run: docker compose up -d
 
       - name: Install refinery
-        run: cargo install refinery_cli --no-default-features --features=postgresql
+        run: test $(which refinery) -o $(alias refinery) || cargo install refinery_cli --no-default-features --features=postgresql
 
       - name: Run migration scripts
         run: DB_PATH="postgres://postgres:postgres@localhost:5432/postgres" refinery migrate -e DB_PATH -p ./crates/db/migrations
@@ -53,10 +53,10 @@ jobs:
         run: docker compose up -d
 
       - name: Install refinery
-        run: cargo install refinery_cli --no-default-features --features=postgresql
+        run: test $(which refinery) -o $(alias refinery) || cargo install refinery_cli --no-default-features --features=postgresql
 
       - name: Run migration scripts
-        run: DB_PATH="postgres://postgres:postgres@localhost:5432/postgres" refinery migrate -e DB_PATH -p ./crates/db/migrations
+        run: refinery migrate -p ./crates/db/migrations
 
       - name: Run cargo build
         shell: bash

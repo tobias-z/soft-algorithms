@@ -5,7 +5,7 @@ use sqlx::{Pool, Postgres};
 pub mod connection;
 pub mod model;
 
-struct RoadService {
+pub struct RoadService {
     pool: Pool<Postgres>,
 }
 

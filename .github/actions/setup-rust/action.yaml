@@ -17,7 +17,7 @@ runs:
     - name: Install rust stable
       uses: dtolnay/rust-toolchain@stable
       with:
-          toolchain: stable
+          toolchain: nightly
           override: true
           components: rustfmt, clippy
 

@@ -23,7 +23,6 @@ services:
       postgres:
         condition: service_healthy
     build: .
-    command: "sleep infinity"
     ports:
       - "3000:3000"
     env_file:

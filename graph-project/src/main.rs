@@ -3,9 +3,9 @@
 pub async fn main() -> std::io::Result<()> {
     use actix_files::Files;
     use actix_web::*;
+    use graph_project::app::*;
     use leptos::*;
     use leptos_actix::{generate_route_list, LeptosRoutes};
-    use graph_project::app::*;
 
     let conf = get_configuration(None).await.unwrap();
     let addr = conf.leptos_options.site_addr;

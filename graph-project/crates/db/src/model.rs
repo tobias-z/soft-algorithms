@@ -1,3 +1,4 @@
+#[derive(Debug)]
 pub struct RoadPart {
     pub id: i64,
     pub road_name: String,

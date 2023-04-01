@@ -10,7 +10,7 @@ pub struct RoadService {
 }
 
 impl RoadService {
-    async fn new(pool: Box<dyn Connection<Postgres>>) -> Self {
+    pub async fn new(pool: Box<dyn Connection<Postgres>>) -> Self {
         let pool = pool
             .connect()
             .await
@@ -18,7 +18,7 @@ impl RoadService {
         Self { pool }
     }
 
-    pub async fn get_roads(&self) -> Result<Vec<RoadPart>, sqlx::Error> {
+    pub async fn get_road_parts(&self) -> Result<Vec<RoadPart>, sqlx::Error> {
         sqlx::query_as!(
             RoadPart,
             "

@@ -6,12 +6,12 @@ pub trait Connection<T: Database> {
     async fn connect(&self) -> Result<Pool<T>, Error>;
 }
 
-struct PostgresConnection {
+pub struct PostgresConnection {
     max_connections: u32,
 }
 
 impl PostgresConnection {
-    fn new(max_connections: u32) -> Self {
+    pub fn new(max_connections: u32) -> Self {
         Self { max_connections }
     }
 }
@@ -23,14 +23,13 @@ impl Connection<Postgres> for PostgresConnection {
         let password =
             std::env::var("POSTGRES_PASSWORD").expect("variable POSTGRES_PASSWORD was missing");
         let host = std::env::var("POSTGRES_HOST").expect("variable POSTGRES_HOST was missing");
-        let port = std::env::var("POSTGRES_PORT").expect("variable POSTGRES_PORT was missing");
         let database =
             std::env::var("POSTGRES_DATABASE").expect("variable POSTGRES_DATABASE was missing");
         sqlx::postgres::PgPoolOptions::new()
             .max_connections(self.max_connections)
             .connect(&format!(
-                "postgres://{}:{}@{}:{}/{}",
-                username, password, host, port, database
+                "postgres://{}:{}@{}/{}",
+                username, password, host, database
             ))
             .await
     }

@@ -29,10 +29,24 @@ jobs:
         run: docker compose up -d
 
       - name: Ensure containers are ready
-        uses: thegabriele97/dockercompose-health-action@main
-        with:
-          timeout: '60'
-          workdir: '.'
+        run: |
+          regx='\s*([Rr]unning|[uU]p) \(healthy\)'
+          secs="60" # Set interval (duration) in seconds.
+          endTime=$(( $(date +%s) + secs )) # Calculate end time.
+          while [ $(date +%s) -lt $endTime ]; do  # Loop until interval has elapsed.
+              cnt=2
+              while IFS= read -r line; do
+                  if [[ $line =~ $regx ]]; then
+                      cnt=$((cnt+1))
+                  fi
+              done <<< $(docker compose ps)
+              echo -en "\rWaiting for services... $cnt/$(docker compose ps | wc -l)"
+              if [[ $cnt -eq $(docker compose ps | wc -l) ]]; then
+                  echo ""
+                  exit 0
+              fi
+              sleep 1
+          done
 
       - name: Install refinery
         run: cargo install refinery_cli --no-default-features --features=postgresql || true
@@ -59,10 +73,24 @@ jobs:
         run: docker compose up -d
 
       - name: Ensure containers are ready
-        uses: thegabriele97/dockercompose-health-action@main
-        with:
-          timeout: '60'
-          workdir: '.'
+        run: |
+          regx='\s*([Rr]unning|[uU]p) \(healthy\)'
+          secs="60" # Set interval (duration) in seconds.
+          endTime=$(( $(date +%s) + secs )) # Calculate end time.
+          while [ $(date +%s) -lt $endTime ]; do  # Loop until interval has elapsed.
+              cnt=2
+              while IFS= read -r line; do
+                  if [[ $line =~ $regx ]]; then
+                      cnt=$((cnt+1))
+                  fi
+              done <<< $(docker compose ps)
+              echo -en "\rWaiting for services... $cnt/$(docker compose ps | wc -l)"
+              if [[ $cnt -eq $(docker compose ps | wc -l) ]]; then
+                  echo ""
+                  exit 0
+              fi
+              sleep 1
+          done
 
       - name: Install refinery
         run: cargo install refinery_cli --no-default-features --features=postgresql || true

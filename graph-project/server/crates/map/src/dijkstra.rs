@@ -5,7 +5,7 @@ use std::{
     sync::Arc,
 };
 
-use serde::{Deserialize, Serialize};
+use serde::{Deserialize, Serialize, __private::de::UntaggedUnitVisitor};
 
 use crate::{Map, Node};
 
@@ -42,21 +42,16 @@ impl Ord for WeightedNode {
 
 impl Map {
     pub fn shortest_path(&self, from_node: &i64) -> HashMap<i64, Arc<RefCell<WeightedNode>>> {
-        let mut unvisited: BinaryHeap<Arc<RefCell<WeightedNode>>> = self
-            .nodes
-            .values()
-            .map(|node| {
-                Arc::new(RefCell::new(WeightedNode {
-                    node: Arc::clone(node),
-                    prev_node: None,
-                    weight: if &node.id == from_node { 0 } else { INFINITY },
-                }))
-            })
-            .collect();
-        let all_nodes: HashMap<i64, Arc<RefCell<WeightedNode>>> = unvisited
+        let mut unvisited: BinaryHeap<Arc<RefCell<WeightedNode>>> = BinaryHeap::new();
+        let all_nodes: HashMap<i64, Arc<RefCell<WeightedNode>>> = self.nodes
             .iter()
-            .map(|node| (node.borrow().node.id, Arc::clone(node)))
+            .map(|(id, node)| (*id, Arc::new(RefCell::new(WeightedNode {
+                node: Arc::clone(node),
+                prev_node: None,
+                weight: if &node.id == from_node { 0 } else { INFINITY },
+            }))))
             .collect();
+        unvisited.push(Arc::clone(all_nodes.get(from_node).unwrap()));
         let mut visited = HashMap::new();
 
         while let Some(next) = unvisited.pop() {
@@ -73,13 +68,9 @@ impl Map {
                     if next_weight < related_node.weight {
                         related_node.weight = next_weight;
                         related_node.prev_node = Some(Arc::clone(&next));
-
-                        // rebuild priority queue with the changed value.
-                        // Not sure how this can be done more effeciently. This seems like a really
-                        // bad idea
-                        drop(related_node);
-                        unvisited = unvisited.into_vec().into();
                     }
+                    drop(related_node);
+                    unvisited.push(Arc::clone(all_nodes.get(related_id).unwrap()));
                 }
             }
             visited.insert(next.borrow().node.id, Arc::clone(&next));

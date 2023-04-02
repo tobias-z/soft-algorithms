@@ -26,6 +26,7 @@ jobs:
         uses: ./.github/actions/setup-rust
 
       - name: Start test containers
+        working-directory: server
         run: docker compose up -d
 
       - name: Ensure containers are ready
@@ -35,12 +36,14 @@ jobs:
         run: cargo install refinery_cli --no-default-features --features=postgresql || true
 
       - name: Run migration scripts
+        working-directory: server
         run: refinery migrate -p ./crates/db/migrations
 
       - name: Install nextest
         uses: taiki-e/install-action@ddfbd2cab72fd94842c80ade93f28fe7ee9c71f8
 
       - name: Run cargo test
+        working-directory: server
         shell: bash
         run: cargo nextest run --workspace
   check:
@@ -53,6 +56,7 @@ jobs:
         uses: ./.github/actions/setup-rust
 
       - name: Start test containers
+        working-directory: server
         run: docker compose up -d
 
       - name: Ensure containers are ready
@@ -62,17 +66,21 @@ jobs:
         run: cargo install refinery_cli --no-default-features --features=postgresql || true
 
       - name: Run migration scripts
+        working-directory: server
         run: refinery migrate -p ./crates/db/migrations
 
       - name: Run cargo build
+        working-directory: server
         shell: bash
         run: cargo build --workspace
 
       - name: Run cargo clippy
+        working-directory: server
         shell: bash
         run: cargo clippy --workspace
 
       - name: Run format check
+        working-directory: server
         shell: bash
         run: cargo fmt --check
   deploy:

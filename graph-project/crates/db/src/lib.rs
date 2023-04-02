@@ -11,9 +11,7 @@ pub struct RoadService {
 
 impl RoadService {
     pub async fn new(pool: Box<dyn Connection<Postgres>>) -> sqlx::Result<Self> {
-        let pool = pool
-            .connect()
-            .await?;
+        let pool = pool.connect().await?;
         Ok(Self { pool })
     }
 

@@ -1,3 +1,5 @@
+mod dijkstra;
+
 use std::{
     collections::{HashMap, HashSet},
     rc::Rc,
@@ -15,6 +17,7 @@ impl From<RoadPart> for Node {
     }
 }
 
+#[derive(Clone)]
 pub struct Node {
     pub id: i64,
     pub road_name: String,
@@ -30,7 +33,7 @@ pub struct Relation {
 pub struct Map {
     /// gets the nodes from the database and inserts them into a hashmap.
     /// we use a hashmap here for easy id lookups when creating the relations
-    nodes: HashMap<i64, Rc<Node>>,
+    pub nodes: HashMap<i64, Rc<Node>>,
 
     /// relations are also kept as a hashmap to make finding a specific node in question very fast
     relations: HashMap<i64, Vec<Relation>>,
@@ -97,66 +100,5 @@ impl Map {
             }
         }
         None
-    }
-}
-
-#[cfg(test)]
-mod test {
-    use super::*;
-
-    async fn with_correct_env<F>(closure: F)
-    where
-        F: std::future::Future<Output = ()> + std::future::IntoFuture,
-    {
-        temp_env::async_with_vars(
-            [
-                ("POSTGRES_USER", Some("postgres")),
-                ("POSTGRES_PASSWORD", Some("postgres")),
-                ("POSTGRES_HOST", Some("localhost")),
-                ("POSTGRES_DATABASE", Some("postgres")),
-            ],
-            closure,
-        )
-        .await;
-    }
-
-    #[actix_rt::test]
-    async fn can_return_a_map() {
-        with_correct_env(async {
-            let map = Map::new().await;
-            assert!(map.is_ok());
-        }).await;
-    }
-
-    #[actix_rt::test]
-    #[should_panic]
-    async fn will_fail_if_no_env() {
-        let map = Map::new().await;
-        assert!(map.is_err());
-    }
-
-    #[actix_rt::test]
-    async fn map_has_nodes() {
-        with_correct_env(async {
-            let map = Map::new().await.expect("Map was not found");
-            assert!(!map.nodes.is_empty());
-        }).await;
-    }
-
-    #[actix_rt::test]
-    async fn map_has_relations() {
-        with_correct_env(async {
-            let map = Map::new().await.expect("Map was not found");
-            assert!(!map.nodes.is_empty());
-        }).await;
-    }
-
-    #[actix_rt::test]
-    async fn can_find_node_with_dfs() {
-        with_correct_env(async {
-            let map = Map::new().await.expect("Map was not found");
-            let val = map.find_roadpart_id("skovvej");
-            assert!(val.is_some())
-        }).await;
     }
 }

@@ -75,6 +75,9 @@ impl Map {
             }
             visited.insert(next.borrow().node.id, Rc::clone(&next));
         }
-        visited.into_iter().map(|(id, node)| (id, node.borrow().clone())).collect()
+        visited
+            .into_iter()
+            .map(|(id, node)| (id, node.borrow().clone()))
+            .collect()
     }
 }

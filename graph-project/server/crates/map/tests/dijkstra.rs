@@ -31,9 +31,6 @@ async fn weights_should_be_added_together() {
     with_correct_env(async {
         let map = Map::new().await.expect("Map was not found");
         let nodes = map.shortest_path(&1);
-        // nodes.iter().for_each(|(id, node)| {
-        //     println!("node: {} - {}", id, node.weight)
-        // });
         assert_eq!(nodes.get(&3).unwrap().borrow().node.id, 3);
         // // 0 + 1 + 2
         assert_eq!(nodes.get(&3).unwrap().borrow().weight, 3);

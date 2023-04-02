@@ -20,7 +20,10 @@ async fn get_shortest_path_for_id(
     id: i64,
 ) -> Result<Json<HashMap<i64, Arc<RefCell<WeightedNode>>>>, Status> {
     match map::Map::new().await {
-        Ok(map) => Ok(Json(map.shortest_path(&id))),
+        Ok(map) => match map.shortest_path(&id) {
+            Some(paths) => Ok(Json(paths)),
+            None => Err(Status::NotFound),
+        },
         Err(_) => Err(Status::InternalServerError),
     }
 }

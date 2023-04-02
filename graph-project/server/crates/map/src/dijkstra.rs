@@ -5,7 +5,7 @@ use std::{
     sync::Arc,
 };
 
-use serde::{Deserialize, Serialize, __private::de::UntaggedUnitVisitor};
+use serde::{Deserialize, Serialize};
 
 use crate::{Map, Node};
 
@@ -41,15 +41,28 @@ impl Ord for WeightedNode {
 }
 
 impl Map {
-    pub fn shortest_path(&self, from_node: &i64) -> HashMap<i64, Arc<RefCell<WeightedNode>>> {
+    pub fn shortest_path(
+        &self,
+        from_node: &i64,
+    ) -> Option<HashMap<i64, Arc<RefCell<WeightedNode>>>> {
+        if !self.nodes.contains_key(from_node) {
+            return None;
+        }
+
         let mut unvisited: BinaryHeap<Arc<RefCell<WeightedNode>>> = BinaryHeap::new();
-        let all_nodes: HashMap<i64, Arc<RefCell<WeightedNode>>> = self.nodes
+        let all_nodes: HashMap<i64, Arc<RefCell<WeightedNode>>> = self
+            .nodes
             .iter()
-            .map(|(id, node)| (*id, Arc::new(RefCell::new(WeightedNode {
-                node: Arc::clone(node),
-                prev_node: None,
-                weight: if &node.id == from_node { 0 } else { INFINITY },
-            }))))
+            .map(|(id, node)| {
+                (
+                    *id,
+                    Arc::new(RefCell::new(WeightedNode {
+                        node: Arc::clone(node),
+                        prev_node: None,
+                        weight: if &node.id == from_node { 0 } else { INFINITY },
+                    })),
+                )
+            })
             .collect();
         unvisited.push(Arc::clone(all_nodes.get(from_node).unwrap()));
         let mut visited = HashMap::new();
@@ -75,6 +88,6 @@ impl Map {
             }
             visited.insert(next.borrow().node.id, Arc::clone(&next));
         }
-        visited
+        Some(visited)
     }
 }

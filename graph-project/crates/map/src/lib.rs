@@ -3,7 +3,7 @@ use std::{
     rc::Rc,
 };
 
-use anyhow::anyhow;
+use anyhow::{anyhow, Result};
 use db::{connection::PostgresConnection, model::RoadPart};
 
 impl From<RoadPart> for Node {
@@ -37,15 +37,18 @@ pub struct Map {
 }
 
 impl Map {
-    pub async fn new() -> anyhow::Result<Self> {
+    pub async fn new() -> Result<Self> {
         let mut map = Self::default();
         map.generate_map().await?;
         Ok(map)
     }
 
-    async fn generate_map(&mut self) -> anyhow::Result<()> {
-        let road_service = db::RoadService::new(Box::new(PostgresConnection::new(5))).await;
-        self.fill_nodes(&road_service).await?;
+    async fn generate_map(&mut self) -> Result<()> {
+        let road_service = db::RoadService::new(Box::new(PostgresConnection::new(5))).await?;
+        let road_parts = road_service.get_road_parts().await?;
+        for road_part in road_parts {
+            self.nodes.insert(road_part.id, Rc::new(road_part.into()));
+        }
         for node in self.nodes.values() {
             let part_relations = road_service.get_relations_of_part(node.id).await?;
             let mut node_relations = vec![];
@@ -68,14 +71,6 @@ impl Map {
         Ok(())
     }
 
-    async fn fill_nodes(&mut self, road_service: &db::RoadService) -> anyhow::Result<()> {
-        let road_parts = road_service.get_road_parts().await?;
-        for road_part in road_parts {
-            self.nodes.insert(road_part.id, Rc::new(road_part.into()));
-        }
-        Ok(())
-    }
-
     pub fn find_roadpart_id(&self, road_name: &str) -> Option<i64> {
         match self.nodes.values().next() {
             Some(node) => self.dfs(road_name, node, &mut HashSet::new()),
@@ -93,12 +88,12 @@ impl Map {
         let relations = self.relations.get(&node.id).unwrap();
         for relation in relations {
             if relation.node_one.id != node.id {
-                if let Some(val) = self.dfs(road_name, &relation.node_one, visited) {
-                    return Some(val);
+                if let Some(id) = self.dfs(road_name, &relation.node_one, visited) {
+                    return Some(id);
                 }
             }
-            if let Some(val) = self.dfs(road_name, &relation.node_two, visited) {
-                return Some(val);
+            if let Some(id) = self.dfs(road_name, &relation.node_two, visited) {
+                return Some(id);
             }
         }
         None
@@ -127,11 +122,10 @@ mod test {
 
     #[actix_rt::test]
     async fn can_return_a_map() {
-        async fn test() {
+        with_correct_env(async {
             let map = Map::new().await;
             assert!(map.is_ok());
-        }
-        with_correct_env(test()).await;
+        }).await;
     }
 
     #[actix_rt::test]
@@ -143,29 +137,26 @@ mod test {
 
     #[actix_rt::test]
     async fn map_has_nodes() {
-        async fn test() {
+        with_correct_env(async {
             let map = Map::new().await.expect("Map was not found");
             assert!(!map.nodes.is_empty());
-        }
-        with_correct_env(test()).await;
+        }).await;
     }
 
     #[actix_rt::test]
     async fn map_has_relations() {
-        async fn test() {
+        with_correct_env(async {
             let map = Map::new().await.expect("Map was not found");
             assert!(!map.nodes.is_empty());
-        }
-        with_correct_env(test()).await;
+        }).await;
     }
 
     #[actix_rt::test]
     async fn can_find_node_with_dfs() {
-        async fn test() {
+        with_correct_env(async {
             let map = Map::new().await.expect("Map was not found");
             let val = map.find_roadpart_id("skovvej");
-            println!("{}", val.unwrap());
-        }
-        with_correct_env(test()).await;
+            assert!(val.is_some())
+        }).await;
     }
 }

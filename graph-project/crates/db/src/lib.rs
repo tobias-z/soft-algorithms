@@ -10,12 +10,11 @@ pub struct RoadService {
 }
 
 impl RoadService {
-    pub async fn new(pool: Box<dyn Connection<Postgres>>) -> Self {
+    pub async fn new(pool: Box<dyn Connection<Postgres>>) -> sqlx::Result<Self> {
         let pool = pool
             .connect()
-            .await
-            .expect("unable to create connection to database");
-        Self { pool }
+            .await?;
+        Ok(Self { pool })
     }
 
     pub async fn get_road_parts(&self) -> Result<Vec<RoadPart>, sqlx::Error> {

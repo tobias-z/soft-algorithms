@@ -9,4 +9,5 @@ edition = "2021"
 actix-rt = "2.8.0"
 anyhow = "1.0.70"
 db = { path = "../db"}
+serde = {version = "1.0.159",  features = ["derive"]}
 temp-env = { version ="0.3.3", features = ["async_closure"]}

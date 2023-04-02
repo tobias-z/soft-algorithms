@@ -28,6 +28,12 @@ jobs:
       - name: Start test containers
         run: docker compose up -d
 
+      - name: Ensure containers are ready
+        uses: thegabriele97/dockercompose-health-action@main
+        with:
+          timeout: '60'
+          workdir: '.'
+
       - name: Install refinery
         run: cargo install refinery_cli --no-default-features --features=postgresql || true
 
@@ -51,6 +57,12 @@ jobs:
 
       - name: Start test containers
         run: docker compose up -d
+
+      - name: Ensure containers are ready
+        uses: thegabriele97/dockercompose-health-action@main
+        with:
+          timeout: '60'
+          workdir: '.'
 
       - name: Install refinery
         run: cargo install refinery_cli --no-default-features --features=postgresql || true

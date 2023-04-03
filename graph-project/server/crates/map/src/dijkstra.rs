@@ -41,6 +41,7 @@ impl Ord for WeightedNode {
 }
 
 impl Map {
+    // TODO: should be looking for a specific node
     pub fn shortest_path(
         &self,
         from_node: &i64,

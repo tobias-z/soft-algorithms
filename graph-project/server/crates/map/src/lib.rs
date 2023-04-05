@@ -19,6 +19,7 @@ impl From<RoadPart> for Node {
 }
 
 #[derive(Clone, Serialize, Deserialize, Debug)]
+#[serde(rename_all = "camelCase")]
 pub struct Node {
     pub id: i64,
     pub road_name: String,
@@ -27,6 +28,7 @@ pub struct Node {
 unsafe impl Sync for Node {}
 
 #[derive(Serialize, Deserialize, Debug)]
+#[serde(rename_all = "camelCase")]
 pub struct Relation {
     pub node_one: Arc<Node>,
     pub node_two: Arc<Node>,
@@ -34,6 +36,7 @@ pub struct Relation {
 }
 
 #[derive(Default, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct Map {
     /// gets the nodes from the database and inserts them into a hashmap.
     /// we use a hashmap here for easy id lookups when creating the relations

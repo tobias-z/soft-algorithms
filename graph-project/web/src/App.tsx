@@ -14,28 +14,30 @@ export default function App() {
 }
 
 async function getMap() {
-    const res = await axios.get<Map>("/");
+    const res = await axios.get<GraphMap>("/");
     return res.data;
 }
 
-type MapElementFns = {
-    setRoadPosition?: (cb: (roadPosition: RoadPosition) => RoadPosition) => void;
-};
-
-type MapNode = MapElementFns & {
+type MapNode = {
     id: number;
     roadName: string;
 };
 
-type MapRelation = MapElementFns & {
+type MapRelation = {
     nodeOne: MapNode;
     nodeTwo: MapNode;
     weight: number;
 };
 
-type Map = {
+type GraphMap = {
     nodes: Record<number, MapNode>;
     relations: Record<number, Array<MapRelation>>;
+};
+
+type WeightedNode = {
+    node: MapNode;
+    prevNode?: WeightedNode;
+    weight: number;
 };
 
 function RoadMap() {
@@ -55,95 +57,195 @@ type RoadPosition = {
     width: number;
     height: number;
     color: string;
-    round?: boolean;
+    isRoad: boolean;
+    text?: string;
+    onClick?: (oldLines: Record<string, RoadPosition>) => void;
 };
 
 function getLength(weight: number) {
-    console.log(weight * 100);
-    return weight * 100;
+    return weight * 25;
 }
 
 const DEFAULT_ROAD_WIDTH = 5;
 
 function Roads() {
     const map = useMapContext();
-    const [lines, setLines] = useState<Array<RoadPosition>>([]);
+    const [lines, setLines] = useState<Record<string, RoadPosition>>({});
+    const [from, setFrom] = useState("");
+    const [to, setTo] = useState("");
+    const [road, setRoad] = useState<Array<WeightedNode>>([]);
 
     useEffect(() => {
-        const visitedNodes = new Set<number>();
-        const newLines: typeof lines = [];
-        let currX = 10;
-        let currY = 10;
-        let currRoadName = "";
-        let currWidth = 100;
-        let currHeight = DEFAULT_ROAD_WIDTH;
-        for (const node of Object.values(map.nodes)) {
-            const relations = map.relations[node.id];
-            node.setRoadPosition = cb => {
-                setLines(lines =>
-                    lines.map(line => {
-                        if (line.id !== node.id.toString()) {
-                            return line;
-                        }
-                        return cb(line);
-                    })
-                );
-            };
+        const newLines: typeof lines = {};
+        function addLine(node: MapNode, currX: number, currY: number, currHeight: number) {
+            const nodeId = node.id.toString();
+            const relations = map.relations[Number(nodeId)];
+            if (
+                Object.hasOwn(newLines, node.id) &&
+                !relations.find(relation => !Object.hasOwn(newLines, getRelationId(relation)))
+            ) {
+                return;
+            }
 
-            newLines.push({
+            newLines[nodeId] = {
                 id: node.id.toString(),
                 color: "blue",
-                x: currX,
-                y: currY,
+                x: currX - 6,
+                y: currY - 6,
                 width: 20,
                 height: 20,
-                round: true,
-            });
+                isRoad: false,
+                text: nodeId,
+                onClick: oldLines => {
+                    axios.get<Record<number, WeightedNode>>(`/${nodeId}`).then(res => {
+                        const newLines = { ...oldLines };
+                        for (const weightedNode of Object.values(res.data)) {
+                            newLines[weightedNode.node.id].text = weightedNode.weight.toString();
+                        }
+                        setLines(newLines);
+                    });
+                },
+            };
+
+            const availableSpots = {
+                right: true,
+                top: true,
+                bottom: true,
+            };
 
             for (const relation of relations) {
+                const id = getRelationId(relation);
+                if (Object.hasOwn(newLines, id)) {
+                    continue;
+                }
+
                 const relationNode =
                     relation.nodeOne.id === node.id ? relation.nodeTwo : relation.nodeOne;
-                relationNode.setRoadPosition = cb => {
-                    setLines(lines =>
-                        lines.map(line => {
-                            const id = getRelationId(relation);
-                            if (line.id !== id) {
-                                return line;
-                            }
-                            return cb(line);
-                        })
-                    );
-                };
-                if (currHeight === DEFAULT_ROAD_WIDTH) {
-                    // The last line we drew was sideways
-                    if (node.roadName === relationNode.roadName) {
-                        console.log(node, relationNode)
-                        // Keep going the same way
-                        newLines.push({
-                            id: getRelationId(relation),
-                            color: "black",
-                            x: currX,
-                            y: currY,
-                            height: currHeight,
-                            width: getLength(relation.weight),
-                        });
-                    } else {
 
-                    }
-                } else {
+                function onRelationClick(oldLines: Record<number, RoadPosition>) {
+                    axios.get<Record<number, WeightedNode>>(`/${relationNode.id}`).then(res => {
+                        const newLines = { ...oldLines };
+                        for (const weightedNode of Object.values(res.data)) {
+                            newLines[weightedNode.node.id].text = weightedNode.weight.toString();
+                        }
+                        setLines(newLines);
+                    });
                 }
+
+                let width = 0;
+                let nextX = currX;
+                let nextY = currY;
+                let after: () => void = () => { };
+                if (availableSpots.right) {
+                    availableSpots.right = false;
+                    width = getLength(relation.weight);
+                    currHeight = DEFAULT_ROAD_WIDTH;
+                    newLines[relationNode.id.toString()] = {
+                        id: relationNode.id.toString(),
+                        x: nextX + width - 6,
+                        y: nextY - 6,
+                        height: 20,
+                        width: 20,
+                        color: "blue",
+                        isRoad: false,
+                        onClick: onRelationClick,
+                        text: relationNode.id.toString(),
+                    };
+                    after = () => addLine(relationNode, nextX + width, nextY, currHeight);
+                } else if (availableSpots.top) {
+                    availableSpots.top = false;
+                    currHeight = getLength(relation.weight);
+                    width = DEFAULT_ROAD_WIDTH;
+                    nextY = nextY - currHeight;
+                    newLines[relationNode.id.toString()] = {
+                        id: relationNode.id.toString(),
+                        x: nextX - 6,
+                        y: nextY - 6,
+                        height: 20,
+                        width: 20,
+                        color: "blue",
+                        isRoad: false,
+                        onClick: onRelationClick,
+                        text: relationNode.id.toString(),
+                    };
+                    after = () => addLine(relationNode, nextX, nextY, currHeight);
+                } else if (availableSpots.bottom) {
+                    availableSpots.bottom = false;
+                    currHeight = getLength(relation.weight);
+                    width = DEFAULT_ROAD_WIDTH;
+                    newLines[relationNode.id.toString()] = {
+                        id: relationNode.id.toString(),
+                        x: nextX - 6,
+                        y: nextY + currHeight - 6,
+                        height: 20,
+                        width: 20,
+                        color: "blue",
+                        isRoad: false,
+                        onClick: onRelationClick,
+                        text: relationNode.id.toString(),
+                    };
+                    after = () => addLine(relationNode, nextX, nextY + currHeight, currHeight);
+                }
+
+                newLines[id] = {
+                    id,
+                    color: "black",
+                    x: nextX,
+                    y: nextY,
+                    height: currHeight,
+                    width,
+                    isRoad: true,
+                    text: relationNode.roadName,
+                };
+                after();
             }
+        }
+        const currX = 50;
+        const currY = 700;
+        const currHeight = 0;
+        for (let node of Object.values(map.nodes)) {
+            addLine(node, currX, currY, currHeight);
         }
         setLines(newLines);
     }, [map]);
 
     return (
         <div style={{ position: "relative" }}>
-            {lines.map(line => (
-                <>
-                    <p>hello</p>
+            <>
+                <form
+                    onSubmit={e => {
+                        e.preventDefault();
+                        axios
+                            .get<Record<number, WeightedNode>>(`/${from}`)
+                            .then(res => {
+                                const data = res.data;
+                                if (!Object.hasOwn(data, Number(to))) {
+                                    return;
+                                }
+                                const road: Array<WeightedNode> = [];
+                                function appendNext(weightedNode: WeightedNode) {
+                                    road.push(weightedNode);
+                                    if (weightedNode.prevNode) {
+                                        appendNext(weightedNode.prevNode)
+                                    }
+                                }
+                                const startingNode = data[Number(to)];
+                                appendNext(startingNode);
+                                setRoad(road.reverse());
+                            })
+                            .catch(() => { });
+                    }}
+                >
+                    <input name="from" type="number" onChange={e => setFrom(e.target.value)} />
+                    <input name="to" type="number" onChange={e => setTo(e.target.value)} />
+                    <button type="submit">Check</button>
+                </form>
+                {road.map(node => (
+                    <p key={node.node.id}>{node.node.id} ({node.node.roadName}) - takes {node.weight} min</p>
+                ))}
+                {Object.values(lines).map(line => (
                     <div
-                        key={`${line.x}-${line.y}`}
+                        key={line.id}
                         style={{
                             position: "absolute",
                             width: `${line.width}px`,
@@ -151,15 +253,26 @@ function Roads() {
                             top: `${line.y}px`,
                             left: `${line.x}px`,
                             backgroundColor: line.color,
+                            borderRadius: !line.isRoad ? "10px" : "",
+                            zIndex: !line.isRoad ? "100" : "50",
+                            textAlign: "center",
+                            color: "white",
                         }}
-                    />
-                </>
-            ))}
+                        onClick={() => {
+                            if (line.onClick) {
+                                line.onClick(lines);
+                            }
+                        }}
+                    >
+                        {!line.isRoad ? line.text : <p style={{ color: "black" }}>{line.text}</p>}
+                    </div>
+                ))}
+            </>
         </div>
     );
 }
 
-const MapContext = createContext<Map | null>(null);
+const MapContext = createContext<GraphMap | null>(null);
 
 function getRelationId(relation: MapRelation) {
     return `${relation.nodeOne.id}-${relation.nodeTwo.id}`;

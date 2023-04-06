@@ -12,6 +12,7 @@ use crate::{Map, Node};
 const INFINITY: u32 = 999999;
 
 #[derive(Clone, Serialize, Deserialize, Debug)]
+#[serde(rename_all = "camelCase")]
 pub struct WeightedNode {
     pub node: Arc<Node>,
     pub prev_node: Option<Arc<RefCell<WeightedNode>>>,

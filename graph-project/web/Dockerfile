@@ -2,7 +2,7 @@ FROM node:16.20.0-alpine3.17 as builder
 WORKDIR /build
 COPY . .
 RUN npm install
-RUN npm run build
+RUN VITE_GRAPH_SERVER=https://graph-api.tobiasz.dk npm run build
 
 FROM nginx:alpine
 WORKDIR /app

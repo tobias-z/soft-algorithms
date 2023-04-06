@@ -102,8 +102,8 @@ jobs:
           SERVER_URL: ${{ secrets.SERVER_URL }}
         if: ${{ github.event_name != 'pull_request' }}
         run: |
-          version=$(head "Cargo.toml" | grep version | head -n 1 | tr 'version = "' " " | xargs | awk '{print tolower($0)}')
-          project_name=$(head "Cargo.toml" | grep name | head -n 1 | sed 's/"//g' | sed 's/name = //g' | xargs | awk '{print tolower($0)}')
+          version=$(head "server/Cargo.toml" | grep version | head -n 1 | tr 'version = "' " " | xargs | awk '{print tolower($0)}')
+          project_name=$(head "server/Cargo.toml" | grep name | head -n 1 | sed 's/"//g' | sed 's/name = //g' | xargs | awk '{print tolower($0)}')
           echo "$DOCKER_PASSWORD" | docker login --username $DOCKER_USERNAME --password-stdin
           server_image_name="$DOCKER_USERNAME/$project_name-server:$version"
           web_image_name="$DOCKER_USERNAME/$project_name-web:$version"

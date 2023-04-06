@@ -15,7 +15,7 @@ services:
       timeout: 60s
       retries: 5
       start_period: 80s
-  server:
+  graph-project-server:
     container_name: graph-project-server
     image: tobiaszimmer/graph-project-server:$PROJECT_VERSION
     env_file:
@@ -25,13 +25,13 @@ services:
         condition: service_healthy
     networks:
       - prod
-  web:
+  graph-project-web:
     container_name: graph-project-web
     image: tobiaszimmer/graph-project-web:$PROJECT_VERSION
     env_file:
       - .env.prod
     depends_on:
-      - server
+      - graph-project-server
     networks:
       - prod
 

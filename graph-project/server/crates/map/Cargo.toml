@@ -1,0 +1,13 @@
+[package]
+name = "map"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+actix-rt = "2.8.0"
+anyhow = "1.0.70"
+db = { path = "../db"}
+serde = {version = "1.0.159",  features = ["derive"]}
+temp-env = { version ="0.3.3", features = ["async_closure"]}

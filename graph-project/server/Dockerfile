@@ -2,7 +2,6 @@ FROM rust:1.68.0-slim as builder
 WORKDIR /build
 COPY . .
 RUN rustup default nightly
-RUN rustup target add wasm32-unknown-unknown
 RUN apt update && apt install pkg-config libssl-dev -y
 RUN cargo build --release
 RUN cargo install refinery_cli --no-default-features --features=postgresql

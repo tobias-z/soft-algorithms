@@ -42,7 +42,7 @@ impl Ord for WeightedNode {
 }
 
 impl Map {
-    // TODO: should be looking for a specific node
+    /// Finds the shortest path from one node to every other node in the graph
     pub fn shortest_path(
         &self,
         from_node: &i64,
@@ -84,7 +84,6 @@ impl Map {
                         related_node.weight = next_weight;
                         related_node.prev_node = Some(Arc::clone(&next));
                     }
-                    drop(related_node);
                     unvisited.push(Arc::clone(all_nodes.get(related_id).unwrap()));
                 }
             }

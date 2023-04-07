@@ -84,6 +84,7 @@ impl Map {
                         related_node.weight = next_weight;
                         related_node.prev_node = Some(Arc::clone(&next));
                     }
+                    drop(related_node);
                     unvisited.push(Arc::clone(all_nodes.get(related_id).unwrap()));
                 }
             }

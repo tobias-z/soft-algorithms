@@ -42,7 +42,7 @@ impl Ord for WeightedNode {
 }
 
 impl Map {
-    // TODO: should be looking for a specific node
+    /// Finds the shortest path from one node to every other node in the graph
     pub fn shortest_path(
         &self,
         from_node: &i64,

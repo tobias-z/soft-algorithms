@@ -6,9 +6,9 @@
   - [x] load data from database into a usable model
   - [] document the data we use and the process of creating the data
 - [] Map implementation
-  - [] street map / indoor map. We can prob find some way to make this into one algorithm
-  - [] Dijkstra's algorithm
-  - [] depth-first search. Where can this be used?
+  - [x] street map / indoor map. We can prob find some way to make this into one algorithm
+  - [x] Dijkstra's algorithm
+  - [x] depth-first search. Where can this be used?
   - [] Comments on the algorithms
 - [] Documentation
   - [] document the application in general

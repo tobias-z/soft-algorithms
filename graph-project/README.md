@@ -1,10 +1,11 @@
-<div align="center">
-
 # Graph Project
 
-By Tobias Zimmermann (cph-tz11@cphbusiness.dk)
+## Group Members
 
-</div>
+- Mads Bryde, cph-mb870@cphbusiness.dk
+- Mathias Egebjerg Jensen, cph-mj839@cphbusiness.dk
+- Malthe Stefan Woschek, cph-mw202@cphbusiness.dk
+- Tobias Zimmermann, cph-tz11@cphbusiness.dk
 
 ## Table of contents
 

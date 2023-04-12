@@ -23,6 +23,8 @@ This project was intended to make us learn about graphs, and some algorithms. In
 
 The assignment can be found [here](./documents/Graph Project.pdf)
 
+The web app is deployed at: https://graph.tobiasz.dk and the server is deployed at https://graph-api.tobiasz.dk
+
 ## Data
 
 Data was created as if it would be coming from a source not necessarily created for graphs. It is put into a relational database (Postgres), and then later transformed into a graph.

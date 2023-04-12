@@ -33,6 +33,7 @@ async fn weights_should_be_added_together() {
         let nodes = map.shortest_path(&1).unwrap();
         assert_eq!(nodes.get(&3).unwrap().borrow().node.id, 3);
         // // 0 + 1 + 2
+        // 3.prev_node.weight == 1
         assert_eq!(nodes.get(&3).unwrap().borrow().weight, 3);
     })
     .await;

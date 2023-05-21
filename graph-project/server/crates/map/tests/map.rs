@@ -46,3 +46,15 @@ async fn can_find_node_with_dfs() {
     })
     .await;
 }
+
+#[actix_rt::test]
+async fn can_find_node_with_bfs() {
+    with_correct_env(async {
+        let map = Map::new().await.expect("Map was not found");
+        let val = map.bfs(&1, "skovvej");
+        println!("------------------------");
+        let val = map.bfs(&27, "skovvej");
+        assert!(val.is_some())
+    })
+    .await;
+}
